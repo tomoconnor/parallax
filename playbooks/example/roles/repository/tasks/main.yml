@@ -1,0 +1,59 @@
+---
+ - name: Install GnuPG
+   apt: pkg=gnupg state=installed
+
+ - name: Install dpkg-sig
+   apt: pkg=dpkg-sig
+ - name: Install Reprepro
+   apt: pkg=reprepro state=installed
+
+ # the file: module can take with_items too, here we're creating a bunch of directories.
+ - name: Bootstrap directories
+   file: path={{ item }} state=directory
+   with_items:
+     - /var/packages
+     - /var/packages/ubuntu
+     - /var/packages/ubuntu/conf
+     - /var/packages/import
+
+ - name: Set permissions on /var/packages
+   file: path=/var/packages mode=777 recurse=yes
+
+ # This allows us to non-interactively generate a GPG key.
+ - name: Copy GPG Key Template
+   template: src=gpg_template.j2 dest=/var/packages/signing_key_info
+
+ # One thing you'll probably find on a headless server is it's tricky to get enough entropy to generate big keys.
+ # so we'll install something to add more entropy to /dev/urandom
+ - name: Install Randomiser top-up
+   apt: pkg=rng-tools state=installed
+
+ # this starts the rng daemon, and tells it to inject into /dev/urandom
+ - name: Start Randomiser Daemon
+   shell: rngd -b -r /dev/urandom
+ 
+ # this uses the file we deployed earlier on, and generates a GPG key with it. 
+ - name: Generate Package Signing Key
+   shell: gpg --batch --gen-key /var/packages/signing_key_info
+ 
+ # This allows us to deploy the distributions file which reprepro uses to manage the repository
+ - name: Deploy Local Distribution file
+   template: src=distributions.j2 dest=/var/packages/ubuntu/conf/distributions
+ 
+ - name: Deploy Local Options file
+   template: src=options.j2 dest=/var/packages/ubuntu/conf/options
+
+ - name: Install NginX
+   apt: pkg=nginx state=installed
+
+ - name: Install Nginx Config Vhost
+   template: src=repository.conf.j2 dest=/etc/nginx/sites-available/repository.conf
+
+ - name: Remove Default Configuration
+   file: path=/etc/nginx/sites-enabled/default state=absent
+
+ - name: Symlink the config file
+   file: src=/etc/nginx/sites-available/repository.conf path=/etc/nginx/sites-enabled/repository.conf state=link
+   notify:
+     - restart nginx
+ # Have a look in repository/handlers/main.yml for the handler 'restart nginx' 

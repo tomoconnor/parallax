@@ -1,0 +1,7 @@
+---
+# Most times you see a handler, it'll be restarting a service.
+# However, they can actually run any standard module. After I've set the hostname in the /etc/hostname file, we'll call the hostname binary and set it with that too.
+
+
+- name: set hostname
+  shell: /bin/hostname -F /etc/hostname

@@ -1,0 +1,10 @@
+---
+# There's quite a lot of service handlers here, Mostly because I haven't split stuff out into full role modules yet. 
+- name: restart apache
+  service: name=apache2 state=restarted
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted
+
+- name: reread supervisord
+  shell: /usr/bin/supervisorctl reread && /usr/bin/supervisorctl update

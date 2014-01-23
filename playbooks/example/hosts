@@ -1,0 +1,11 @@
+[example_servers]
+192.168.100.1 set_hostname=vm-ex01
+# example of setting a host inventory by IP address.
+# also demonstrates how to set per-host variables.
+
+
+[repository_servers]
+example-repository
+
+#example of setting a host by hostname.  Requires local lookup in /etc/hosts
+# or DNS.

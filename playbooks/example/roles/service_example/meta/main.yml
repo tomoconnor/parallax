@@ -1,0 +1,5 @@
+---
+# The meta directory of a role is the place to set inter-role dependencies.  Here we're stating that service_example relies on the nodejs role. 
+
+dependencies:
+   - { role: nodejs }

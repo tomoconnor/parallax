@@ -1,0 +1,10 @@
+%echo Generating a GPG key for package  signing
+Key-Type: RSA
+Key-Length: 2048
+Name-Real: REPLACE_WITH_YOUR_NAME
+Name-Comment: Package Signing Key
+Name-Email:  REPLACE_WITH_YOUR@EMAIL.ADDR
+Expire-Date: 10y
+%no-ask-passphrase
+%commit
+%echo Done

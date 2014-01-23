@@ -1,0 +1,12 @@
+---
+# Install the bits and bobs required for GridFS Fuse - Unfinished. 
+
+ - name: Install GridFS Fuse Dependencies
+   apt: pkg={{ item }} state=installed
+   with_items:
+      - g++
+      - libfuse-dev
+      - mongodb-dev
+      - libboost
+      - libssl-dev
+      - libssl1.0.0

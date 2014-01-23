@@ -1,0 +1,12 @@
+---
+  - name: Install nodejs
+    apt: pkg=nodejs state=installed
+  - name: Install node-dev
+    apt: pkg=nodejs-dev state=installed
+  - name: Install npm
+    apt: pkg=npm state=installed
+
+# I've no idea if this is a good idea or not, but I've found some old things like it. 
+
+  - name: Create symlink for legacy code node->nodejs
+    file: src=/usr/bin/nodejs dest=/usr/local/bin/node state=link

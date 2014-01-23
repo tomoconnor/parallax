@@ -1,0 +1,76 @@
+---
+ # This is basically the whole install script for a dummy service, basically to show you how it all works.
+ - name: Install Apache2 and modules
+   apt: pkg={{ item }} state=installed
+   with_items:
+      - apache2
+      - apache2-utils
+
+ - name: install python greenlets
+   apt: pkg=python-greenlet state=installed
+
+ - name: install python-six
+   apt: pkg=python-six state=installed
+
+ - name: Install Other Required Packages
+   apt: pkg={{ item }} state=installed force=yes
+   with_items:
+      - gdal-bin
+      - python-scipy
+      - python-sphinx
+      - python-mdp
+      - libcw3
+      - libcw3-dev
+ 
+ # This is a nice example of how shell/creates works, because of course, all a2enmod does is create a symlink (or more than one)
+ - name: Enable Apache Proxying
+   shell: /usr/sbin/a2enmod proxy creates=/etc/apache2/mods-enabled/proxy.conf
+   notify: restart apache
+
+ - name: Enable apache Proxy_http
+   shell: /usr/sbin/a2enmod proxy_http creates=/etc/apache2/mods-enabled/proxy_http.load
+   notify: restart apache
+ 
+ # This deploys the vhost configuration 
+ - name: Install Apache2 settings for  thingyservice
+   template: src=thingyservice.conf.j2 dest=/etc/apache2/sites-available/thingyservice.conf mode=644
+   notify: restart apache
+
+ # This enables the vhost
+ - name: Enable thingyservice
+   file: src=/etc/apache2/sites-available/thingyservice.conf dest=/etc/apache2/sites-enabled/thingyservice.conf state=link
+   notify: restart apache
+   # Notify will only get run once, but we want to be able to notify if either the file changes, or the link.
+   # It's possible to do this with shell: a2enmod {{site}} creates=/etc/apache2/sites-enabled/blah.conf and it'll still skip it if it exists.
+
+ - name: Remove apache default configuration
+   file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+   notify: restart apache
+  # The default vhost config can be a right pain in the arse, if left enabled.
+
+
+   # let's pretend  thingyservice needs dnsmasq too
+ - name: Install Dnsmasq
+   apt: pkg=dnsmasq state=installed
+
+ # We can use a template (or copy: ) to deploy a file to a place, then notify a service.
+ - name: Configure Dnsmasq
+   template: src=dnsmasq.conf.j2 dest=/etc/dnsmasq.conf
+   notify: restart dnsmasq
+
+ 
+ # Here, we'll copy a file in, then trigger a notify.
+ - name: Configure Dnsmasq's default file
+   copy: src=dnsmasq.default dest=/etc/default/dnsmasq mode=644 owner=root group=root
+   notify: restart dnsmasq
+
+ # This enables the service so that it'll come back after a reboot.
+ - name: Enable Dnsmasq service
+   service: name=dnsmasq enabled=yes
+
+ # This will drop a config file for supervisor and reread the config, then run update to start newly available services
+ - name: Deploy configuration for Supervisord--Thingyservice
+   template: src=thingyservice.super.conf.j2 dest=/etc/supervisor/conf.d/thingyservice.conf
+   notify: reread supervisord
+ # as you might have noticed, notify handlers can have any name (within reason)
+

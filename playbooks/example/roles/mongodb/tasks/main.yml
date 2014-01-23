@@ -1,0 +1,18 @@
+---
+ # Install mongodb from the 10gen repository
+ - name: Add the Apt-key for the 10gen repository
+   apt_key: id=7F0CEB10 url=http://docs.mongodb.org/10gen-gpg-key.asc
+
+ 
+ - name: Add the Apt-repository for 10gen
+   apt_repository: repo="deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" state=present update_cache=yes
+# See, that gives us the option to run apt-get update after too!
+
+ - name: Install MongoDB Packages and requirements
+   apt: pkg={{ item }} state=installed force=yes
+   with_items:
+     - mongodb-10gen
+     - python-pymongo
+     - python-pymongo-ext
+     - python-bson
+     - python-bson-ext

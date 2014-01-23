@@ -1,0 +1,8 @@
+---
+ # Install ZeroMQ
+ - name: Install ZeroMQ Packages and requirements
+   apt: pkg={{ item }} state=installed
+   with_items:
+      - libzmq3
+      - libzmq3-dev
+      - python-zmq

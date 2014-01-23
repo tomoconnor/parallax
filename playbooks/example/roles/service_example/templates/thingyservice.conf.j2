@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+ServerName thingyservice
+ServerAdmin webmaster@localhost
+
+DocumentRoot /opt/example/thingy/webroot
+
+ErrorLog ${APACHE_LOG_DIR}/thingy_error.log
+CustomLog ${APACHE_LOG_DIR}/thingy_access.log combined
+
+<Directory /opt/example/thingy/webroot>
+	Options Indexes FollowSymLinks
+	AllowOverride None
+	Require all granted
+</Directory>
+
+<Location />
+  ProxyPass http://127.0.0.1:8888/
+  ProxyPassReverse http://127.0.0.1:8888/
+</Location>
+
+
+</VirtualHost>

@@ -1,0 +1,14 @@
+---
+- name: Install all the packages and stuff required for an Ubuntu Repository Server
+  hosts: repository_servers
+  user: user
+  sudo: yes
+  roles:
+    - common
+    - repository
+#    - nginx
+#    - python
+#    - postgresql
+#    - redis
+#    - memcached
+#    - deployment

@@ -1,0 +1,8 @@
+---
+  - name: Install Memcached from Ubuntu repos
+    apt: pkg={{item}} state=installed
+    with_items:
+      - memcached
+      - libmemcached-dev
+# - name: Do Something
+#   action:

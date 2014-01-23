@@ -1,0 +1,11 @@
+[program:thingyservice]
+command=/opt/example/thingy/application.py
+numprocs=1
+directory=/opt/example/thingy
+user=nobody
+stdout_logfile=/var/log/thingy.out
+stderr_logfile=/var/log/thingy.err
+environment=HOME=/opt/example/thingy
+
+
+

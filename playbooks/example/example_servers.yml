@@ -1,0 +1,17 @@
+---
+- name: Install all the packages and stuff required for an EXAMPLE SERVICE
+  hosts: example_servers
+  user: user
+  sudo: yes
+  roles:
+    - common
+    - mongodb
+    - zeromq
+    - service_example
+    - nodejs
+#    - nginx
+#    - python
+#    - postgresql
+#    - redis
+#    - memcached
+#    - deployment

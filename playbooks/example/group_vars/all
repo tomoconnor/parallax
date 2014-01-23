@@ -1,0 +1,4 @@
+---
+runas_user: nobody
+project_root: /srv/example
+sources_type: direct

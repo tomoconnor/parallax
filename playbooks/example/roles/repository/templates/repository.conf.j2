@@ -1,0 +1,12 @@
+server {
+        listen 80 ;
+        listen [::]:80 ipv6only=on;
+
+        server_name example-repository;
+        gzip on;
+        location / {
+                root /var/packages/ubuntu/;
+                autoindex on;
+        }
+
+}

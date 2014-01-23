@@ -1,0 +1,4 @@
+---
+# this matches the host group in the inventory file, with the same name [example_servers] etc.
+
+sources_type: proxy
