@@ -6,6 +6,11 @@
 
 [repository_servers]
 example-repository
-
 #example of setting a host by hostname.  Requires local lookup in /etc/hosts
 # or DNS.
+
+[webservers]
+web01
+
+[dbservers]
+db01
