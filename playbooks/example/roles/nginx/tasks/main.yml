@@ -1,5 +1,18 @@
 ---
  - name: install Nginx
    apt: pkg=nginx state=installed
+
+ - name: Drop updated nginx.conf file
+   copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root mode=644
+   notify: restart nginx
+
+ - name: Add proxy settings file
+   copy: src=proxy.conf dest=/etc/nginx/conf.d/proxy.conf owner=root group=root mode=644
+   notify: restart nginx
+
+ - name: Remove Default Site Configuration
+   file: path=/etc/nginx/sites-enabled/default state=absent
+   notify: restart nginx
+
  - name: Start Nginx
    service: name=nginx state=started

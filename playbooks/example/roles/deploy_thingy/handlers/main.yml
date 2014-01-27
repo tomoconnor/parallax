@@ -1,0 +1,5 @@
+---
+  - name: reread supervisord
+    shell: /usr/bin/supervisorctl reread && /usr/bin/supervisorctl update
+  - name: restart nginx
+    service: name=nginx state=restarted

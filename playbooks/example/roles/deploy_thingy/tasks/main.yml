@@ -1,0 +1,17 @@
+---
+ - name: Create directory under /srv for thingy
+   file: path=/srv/thingy state=directory mode=755
+
+ - name: Git checkout from github
+   git: repo=https://github.com/tomoconnor/shiny-octo-computing-machine.git
+        dest=/srv/thingy
+
+ - name: Drop Config for supervisord into the conf.d directory
+   copy: src=thingy.super.conf dest=/etc/supervisor/conf.d/thingy.conf
+   notify: reread supervisord
+
+ - name: Drop Reverse Proxy Config for Nginx
+   copy: src=thingy.nginx.conf dest=/etc/nginx/sites-enabled/thingy.conf
+   notify: restart nginx
+
+ 
