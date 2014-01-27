@@ -55,6 +55,7 @@
       - python-dev
       - htop
       - screen
+      - python-pycurl
       - python-lxml
       - git-core
       - libncurses5-dev
