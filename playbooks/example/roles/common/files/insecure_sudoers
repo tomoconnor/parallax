@@ -7,7 +7,7 @@
 
 Defaults	env_reset
 ###### DANGER WILL ROBINSON
-Defaults	!authenticate
+# Defaults	!authenticate
 ###### THIS STOPS SUDO ASKING FOR A PASSWORD TO BECOME ROOT.
 ###### Kinda elegant, but dangerous as all get out. 
 
