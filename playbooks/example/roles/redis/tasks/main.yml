@@ -6,4 +6,4 @@
    apt: pkg=redis-server state=installed
 
  - name: Start Redis
-   service: name=redis state=started
+   service: name=redis-server state=started
