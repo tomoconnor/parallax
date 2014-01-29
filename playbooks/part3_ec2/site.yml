@@ -1,0 +1,42 @@
+---
+# Effectively lifted from the Ansible documentation on EC2:
+# http://docs.ansible.com/ec2_module.html
+
+  - name: Provision an EC2 node
+    hosts: local
+    connection: local
+    gather_facts: False
+    tags: provisioning
+    vars:
+      instance_type: t1.micro
+      security_group: sg_thingy
+      image: ami-a73264ce
+      region: us-east-1
+      keypair: ansible_ec2
+    tasks:
+      - name: Launch new Instance
+        local_action: ec2 instance_tags="Name=AnsibleTest" group={{ security_group }} instance_type={{ instance_type}} image={{ image }} wait=true region={{ region }} keypair={{ keypair }}
+        register: ec2
+
+      - name: Add instance to local host group
+        # local_action: add_host hostname={{ item.public_ip }} groupname=launched
+        local_action: lineinfile dest=hosts regexp="{{ item.public_dns_name }}" insertafter="[launched]" line="{{ item.public_dns_name }} ansible_ssh_private_key_file=~/.ssh/{{ keypair }}.pem"
+        with_items: ec2.instances
+        #"
+
+      - name: Wait for SSH to come up
+        local_action: wait_for host={{ item.public_dns_name }} port=22 delay=60 timeout=320 state=started
+        with_items: ec2.instances
+
+  - name: With the newly provisioned EC2 node configure that thing
+    hosts: launched # This uses the hosts that we put into the in-memory hosts repository with the add_host module.
+    sudo: yes # On EC2 nodes, this is automatically passwordless. 
+    remote_user: ubuntu # This is the username for all ubuntu images, rather than root, or something weird.
+    gather_facts: True  #We need to re-enable this, as we turned it off earlier.
+    roles:
+      - common
+      - redis
+      - nginx
+      - zeromq
+      - deploy_thingy
+      # These are the same roles as we configured in the 'Parallax/example' playbook, except they've been symlinked into this one.

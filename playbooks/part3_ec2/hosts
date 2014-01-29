@@ -1,0 +1,5 @@
+[local]
+localhost
+
+[launched]
+ec2-54-204-187-220.compute-1.amazonaws.com ansible_ssh_private_key_file=~/.ssh/ansible_ec2.pem

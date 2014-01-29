@@ -6,3 +6,12 @@
       - libzmq3
       - libzmq3-dev
       - python-zmq
+   when: ansible_distribution_release == "saucy"
+
+ - name: Install ZeroMQ Packages and requirements
+   apt: pkg={{ item }} state=installed
+   with_items:
+      - libzmq1
+      - libzmq-dev
+      - python-zmq
+   when: ansible_distribution_release == "precise"
