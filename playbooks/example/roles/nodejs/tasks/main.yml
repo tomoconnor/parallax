@@ -10,3 +10,8 @@
 
   - name: Create symlink for legacy code node->nodejs
     file: src=/usr/bin/nodejs dest=/usr/local/bin/node state=link
+    when: ansible_distribution_release == "saucy"
+
+  - name: Create symlink for legacy node platforms
+    file: src=/usr/bin/node dest=/usr/bin/nodejs state=link
+    when: ansible_distribution_release != "saucy"
