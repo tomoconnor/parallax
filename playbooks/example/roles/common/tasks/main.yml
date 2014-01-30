@@ -29,21 +29,21 @@
 # access_user is a host variable, where it's possible to set the name of the user you'll ssh in as 
   - name: create .ssh directory
     file: path=/home/{{access_user}}/.ssh owner={{access_user}} group={{access_user}} mode=700 state=directory
-    when: ansible_ec2_profile != "default-paravirtual"
+    when: ansible_ec2_profile is not defined
 # This generates a ssh-key noninteractively. 
   - name: generate a  ssh-key for the access_user
     shell: ssh-keygen -t rsa -N "" -f /home/{{access_user}}/.ssh/id_rsa -q creates=/home/{{access_user}}/.ssh/id_rsa
-    when: ansible_ec2_profile != "default-paravirtual"
+    when: ansible_ec2_profile is not defined
 # This is a way to drop an authorized_keys file into the access_user's ssh directory, to make logging in easier. 
   - name: deploy access ssh-key to user's authorized keys file
     copy: src=authorized_keys dest=/home/{{access_user}}/.ssh/authorized_keys
-    when: ansible_ec2_profile != "default-paravirtual"
+    when: ansible_ec2_profile is not defined
 
 # This deploys an *incredibly* dubious sudoers file (that'll never ask for a password to become root) - makes fast deployment easier.
 # Skip on EC2
   - name: Deploy Sudoers file
     copy: src=insecure_sudoers dest=/etc/sudoers mode=440 owner=root group=root
-    when: ansible_ec2_profile != "default-paravirtual"
+    when: ansible_ec2_profile is not defined
 
 # The rest of this file is really about configuring commonly used packages, useful stuff and so on.
 
