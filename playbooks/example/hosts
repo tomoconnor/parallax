@@ -1,16 +1,15 @@
-[example_servers]
-192.168.100.1 set_hostname=vm-ex01
+[demoboxes]
 # example of setting a host inventory by IP address.
 # also demonstrates how to set per-host variables.
+192.168.1.97 remote_user=tom access_user=tom 
 
-
-[repository_servers]
-example-repository
-#example of setting a host by hostname.  Requires local lookup in /etc/hosts
-# or DNS.
-
-[webservers]
-web01
-
-[dbservers]
-db01
+#[repository_servers]
+#example-repository
+##example of setting a host by hostname.  Requires local lookup in /etc/hosts
+## or DNS.
+#
+#[webservers]
+#web01
+#
+#[dbservers]
+#db01

@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+import requests
+import json
+import sys
+import os
+
+username = "{{github_user}}"
+repository = "{{repository_name}}"
+key = open(sys.argv[1], 'r').read()
+key_name = os.path.splitext(sys.argv[1])[0].replace("/","_")
+oauth_token = "{{ansible_github_key}}"
+
+payload = {
+  "title": key_name,
+  "key": key
+}
+headers = {'Authorization': "token %s "% oauth_token}
+
+r = requests.post("https://api.github.com/repos/%s/%s/keys" % (username, repository), data=json.dumps(payload), headers=headers)
+
+print r.status_code, r.content

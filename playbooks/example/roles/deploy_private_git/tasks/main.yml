@@ -1,0 +1,40 @@
+---
+# tasks file for deploy_private_git
+
+ - name: Install the requirements for setDeployKey.py
+   apt: pkg=python-requests state=installed
+
+ - name: Deploy the setDeployKey scriptlet.
+   template: src=setDeployKey.py.j2 dest=/usr/local/bin/setDeployKey.py owner=root group=root mode=755
+
+ - name: Generate a SSH key to use for deployment
+   shell: ssh-keygen -t rsa -N "" -f /home/{{access_user}}/.ssh/deployment_rsa -q creates=/home/{{access_user}}/.ssh/deployment_rsa
+   sudo: False
+   tags: fuckit
+
+ - name: Reconfigure permissions on keys
+   file: path=/home/{{access_user}}/.ssh/deployment_rsa owner={{access_user}} group={{access_user}} mode=600
+   tags: fuckit
+
+ - name: Reconfigure permissions on public key
+   file: path=/home/{{access_user}}/.ssh/deployment_rsa.pub owner={{access_user}} group={{access_user}} mode=600
+   tags: fuckit
+
+ - name: Run the setDeployKey scriptlet
+   shell: /usr/local/bin/setDeployKey.py /home/{{access_user}}/.ssh/deployment_rsa.pub
+   register: deploy_key_output
+   sudo: False
+   tags: fuckit
+
+ - name: run ssh-keyscan
+   shell: ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
+   tags: fuckit
+
+ - name: Set ssh config file for {{access_user}} for accessing github
+   template: src=ssh_config.j2 dest=/home/{{access_user}}/.ssh/config owner={{access_user}} group={{access_user}} mode=644
+   tags: fuckit
+
+ - name: Deploy the code using the new key.
+   git: repo={{github_repository_url}} version=HEAD dest=/home/{{access_user}}/{{repository_name}}
+   sudo: False
+   tags: fuckit

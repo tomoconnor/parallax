@@ -1,0 +1,8 @@
+---
+# vars file for deploy_private_git
+# To obtain your value for ansible_github_key, go to https://github.com/settings/applications and create a new Personal Access Token
+# Paste the value of the token into the value here
+ansible_github_key: #HERE
+github_user: tomoconnor
+repository_name: bearded-adventure
+github_repository_url: git@github.com:tomoconnor/bearded-adventure.git
