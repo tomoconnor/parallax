@@ -1,35 +1,14 @@
 ---
 
-- name: Apply common configuration to all target nodes
+- name: Install all the packages and stuff required for a demobox
   hosts: all
   user: tom
   sudo: yes
-  roles: 
-    - common
-
-- name: Install all the packages and stuff required for a demobox
-  hosts: demoboxes
-  user: tom
-  sudo: yes
   roles:
-    # - redis
-    # - nginx
-    # - nodejs
-    # - zeromq
-    # - deploy_thingy
-    - deploy_private_git
+    - common
+    - redis
+    - nginx
+    - nodejs
 
 
-#- name: Install all the packages and stuff required for a webserver
-#  hosts: webservers
-#  user: user
-#  sudo: yes
-#  roles:
-#    - nginx
-#
-#- name: Install all the packages and stuff required for a Database Server
-#  hosts: dbservers
-#  user: user
-#  sudo: yes
-#  roles:
-#    - redis
+
