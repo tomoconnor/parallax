@@ -1,0 +1,65 @@
+---
+- name: Install everything needed for a staging server running our app.
+  hosts: staging
+  user: ubuntu
+  sudo: yes
+  vars:
+    database_name: "tutorial"
+    database_user: "tutorialuser"
+    database_password: "PleaseChangeThisToYourPassword"
+    database_hostname: "localhost"
+    database_port: 5432
+    django_settings: "tutorialapp.settings" #CHANGE THIS TOO
+    project_root: /srv/tutorial
+    project_deploy_strategy: git
+    project_git_repo: git@github.com:FILL_IN_YOUR_PATH_HERE
+    project_accept_hostkey: yes
+    project_finalize: true
+    project_unwanted_items: ['.git']
+    fail2ban_services:
+      - name: ssh
+        enabled: true
+        port: ssh
+        filter: sshd
+        logpath: /var/log/auth.log
+        maxretry: 3
+        protocol: tcp
+  roles:
+    - common
+    - role: ANXS.monit
+      monit_notify_email: "sysadmin.email@example.org"
+
+    - role: ANXS.postgresql
+      monit_protection: true
+      postgresql_databases:
+        - name: "{{database_name}}"
+      postgresql_users:
+        - name: "{{database_user}}"
+          pass: "{{database_password}}"
+          encrypted: no
+      postgresql_user_privileges:
+        - name: "{{database_user}}"
+          db: "{{datbase_name}}"
+          priv: "ALL"
+
+    - role: f500.project_deploy
+      tags: deploy
+
+    - role: EDITD.virtualenv
+      tags: deploy
+      virtualenv_path: "{{project_root}}/current"
+      virtualenv_requirements_file: "{{project_root}}/current/requirements.txt"
+      virtualenv_user: root
+      virtualenv_group: root
+
+    - role: ANXS.nginx
+      tags: nginx
+      nginx_install_method: package
+
+    - role: joshualund.ufw
+      ufw_connection_rate_limits:
+        - {port: 22, protocol: tcp}
+      ufw_whitelisted_ports:
+        - {port: 22, protocol: tcp}
+        - {port: 80, protocol: tcp}
+        - {port: 443, protocol: tcp}

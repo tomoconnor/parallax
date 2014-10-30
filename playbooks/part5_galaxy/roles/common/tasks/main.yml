@@ -1,0 +1,79 @@
+---
+# This is a thing I devised to set the hostname of a newly provisioned box (ideal if you use kickstart, and the new host comes up with a daft name).
+  - name: Gather EC2 Facts
+    action: ec2_facts
+
+  - name: Set Hostname according to hosts inventory
+    template: src=hostname.j2 dest=/etc/hostname
+    when: set_hostname is defined
+    notify: set hostname
+# This ensures that there's a line in the file /etc/hosts to describe the new hostname.
+  - name: Ensure self-reference hostname in /etc/hosts
+    lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line="127.0.0.1 localhost {{ set_hostname }}" owner=root group=root mode=0644
+    when: set_hostname is defined
+#"
+
+# This is optional, but effectively prevents the installation of i386 packages. 
+# Handy when you have an amd64-only local apt mirror.
+
+  - name: Remove i386 architecture
+    shell: dpkg --remove-architecture i386
+    when: ansible_distribution_release == "saucy"
+    tags: firstrun
+
+# This is very useful.  Basically translates to "run apt-get update" on the target
+  - name: Regenerate apt-cache
+    apt: update_cache=yes
+
+# Skip these on EC2 hosts.
+# access_user is a host variable, where it's possible to set the name of the user you'll ssh in as 
+  - name: create .ssh directory
+    file: path=/home/{{access_user}}/.ssh owner={{access_user}} group={{access_user}} mode=700 state=directory
+    when: ansible_ec2_profile is not defined
+# This generates a ssh-key noninteractively. 
+  - name: generate a  ssh-key for the access_user
+    shell: ssh-keygen -t rsa -N "" -f /home/{{access_user}}/.ssh/id_rsa -q creates=/home/{{access_user}}/.ssh/id_rsa
+    when: ansible_ec2_profile is not defined
+# This is a way to drop an authorized_keys file into the access_user's ssh directory, to make logging in easier. 
+  - name: deploy access ssh-key to user's authorized keys file
+    copy: src=authorized_keys dest=/home/{{access_user}}/.ssh/authorized_keys
+    when: ansible_ec2_profile is not defined
+
+# This deploys an *incredibly* dubious sudoers file (that'll never ask for a password to become root) - makes fast deployment easier.
+# Skip on EC2
+  - name: Deploy Sudoers file
+    copy: src=insecure_sudoers dest=/etc/sudoers mode=440 owner=root group=root
+    when: ansible_ec2_profile is not defined
+
+# The rest of this file is really about configuring commonly used packages, useful stuff and so on.
+
+# There's two ways to call the apt module.  You can do it like this, specifying one package, and its state (installed, absent) etc.
+  - name: install python-software-properties
+    apt: pkg=python-software-properties state=installed
+
+#If you're doing lots of packages at once, you can use with_items, and provide the apt: module with pkg={{ item }} and you get something like a foreach in [list] effect.
+
+  - name: install default packages
+    apt: pkg={{ item }} state=installed
+    with_items:
+      - aptitude
+      - vim
+      - supervisor
+      - python-dev
+      - htop
+      - screen
+      - python-pycurl
+      - python-lxml
+      - git-core
+      - libncurses5-dev
+      - build-essential
+      - unzip
+      - curl
+      - libcurl3
+      - libssl1.0.0
+      - libsqlite3-0
+      - libsqlite3-dev
+
+# This deploys a sane (reasonably so) config for supervisord
+  - name: Deploy supervisord.conf
+    template: src=supervisord.conf.j2 dest=/etc/supervisor/supervisord.conf owner=root group=root mode=644
